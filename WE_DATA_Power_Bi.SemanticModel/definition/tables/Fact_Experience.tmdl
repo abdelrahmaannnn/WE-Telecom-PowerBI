@@ -1,0 +1,92 @@
+table Fact_Experience
+	lineageTag: 90e9deee-ad1d-44f8-a4c7-9f7c9884a96e
+
+	column Experience_Key
+		dataType: int64
+		formatString: 0
+		lineageTag: 3923852c-ac30-4bc2-bf6b-6da9e68d21db
+		summarizeBy: count
+		sourceColumn: Experience_Key
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column Customer_Key
+		dataType: int64
+		formatString: 0
+		lineageTag: 769856bb-362e-49d0-9cf4-557d77c79e83
+		summarizeBy: count
+		sourceColumn: Customer_Key
+
+		annotation SummarizationSetBy = Automatic
+
+	column Date_Key
+		dataType: int64
+		formatString: 0
+		lineageTag: ab7fbbb7-f536-4134-94de-c7575adedd37
+		summarizeBy: none
+		sourceColumn: Date_Key
+
+		annotation SummarizationSetBy = Automatic
+
+	column NPS_Score
+		dataType: int64
+		formatString: 0
+		lineageTag: 63ce4d27-22e6-4af4-9131-ae932132edcd
+		summarizeBy: sum
+		sourceColumn: NPS_Score
+
+		annotation SummarizationSetBy = Automatic
+
+	column CSAT_Score
+		dataType: int64
+		formatString: 0
+		lineageTag: 3e08661e-609d-45dd-a745-5b069b4dda1c
+		summarizeBy: sum
+		sourceColumn: CSAT_Score
+
+		annotation SummarizationSetBy = Automatic
+
+	column Interaction_Type
+		dataType: string
+		lineageTag: 9df5d041-2253-44ee-a8b9-6f09bf8373ed
+		summarizeBy: none
+		sourceColumn: Interaction_Type
+
+		annotation SummarizationSetBy = Automatic
+
+	column Issue_Resolved_First_Contact
+		dataType: int64
+		formatString: 0
+		lineageTag: fc016a74-1229-4205-b15b-f010e2c836d2
+		summarizeBy: sum
+		sourceColumn: Issue_Resolved_First_Contact
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Fact_Experience = m
+		mode: import
+		source =
+				let
+				  Source = Folder.Files("C:\Users\owner\Downloads\Data\WE_DATA\Fact_Experience"),
+				  #"Filtered hidden files" = Table.SelectRows(Source, each [Attributes]?[Hidden]? <> true),
+				  #"Added custom" = let
+				    rootPath = Text.TrimEnd(Value.Metadata(Value.Type(#"Filtered hidden files"))[FileSystemTable.RootPath]?, "\"),
+				    combinePaths = (path1, path2) => Text.Combine({Text.TrimEnd(path1, "\"), path2}, "\"),
+				    getRelativePath = (path, relativeTo) => Text.Middle(path, Text.Length(relativeTo) + 1)
+				in
+				    Table.AddColumn(#"Filtered hidden files", "Relative Path", each getRelativePath(combinePaths([Folder Path], [Name]), rootPath), type text),
+				  #"Invoke custom function" = Table.AddColumn(#"Added custom", "Transform file (3)", each #"Transform file (3)"([Content])),
+				  #"Renamed columns" = Table.RenameColumns(#"Invoke custom function", {{"Relative Path", "Source.Name"}}),
+				  #"Removed other columns" = Table.SelectColumns(#"Renamed columns", {"Source.Name", "Transform file (3)"}),
+				  #"Expanded table column" = Table.ExpandTableColumn(#"Removed other columns", "Transform file (3)", Table.ColumnNames(#"Transform file (3)"(#"Sample file (3)"))),
+				  #"Changed column type" = Table.TransformColumnTypes(#"Expanded table column", {{"Experience_Key", Int64.Type}, {"Customer_Key", Int64.Type}, {"Date_Key", Int64.Type}, {"NPS_Score", Int64.Type}, {"CSAT_Score", Int64.Type}, {"Interaction_Type", type text}, {"Issue_Resolved_First_Contact", Int64.Type}}),
+				    #"Removed Columns" = Table.RemoveColumns(#"Changed column type",{"Source.Name"})
+				in
+				    #"Removed Columns"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation
+

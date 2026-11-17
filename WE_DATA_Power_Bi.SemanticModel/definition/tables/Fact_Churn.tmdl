@@ -1,0 +1,82 @@
+table Fact_Churn
+	lineageTag: 027dcc43-61a7-4f2f-b05c-eeb3272d9fd4
+
+	column Churn_Key
+		dataType: int64
+		formatString: 0
+		lineageTag: 889f2f07-8c46-4208-b20e-ac0680dffd5f
+		summarizeBy: count
+		sourceColumn: Churn_Key
+
+		annotation SummarizationSetBy = Automatic
+
+	column Customer_Key
+		dataType: int64
+		formatString: 0
+		lineageTag: 84a8bb07-38b1-4937-8725-275c4fa107c7
+		summarizeBy: count
+		sourceColumn: Customer_Key
+
+		annotation SummarizationSetBy = Automatic
+
+	column Date_Key
+		dataType: int64
+		formatString: 0
+		lineageTag: 7aac76bf-c0f7-490e-bb98-4e3f47bda241
+		summarizeBy: none
+		sourceColumn: Date_Key
+
+		annotation SummarizationSetBy = Automatic
+
+	column Is_Churned
+		dataType: int64
+		formatString: 0
+		lineageTag: 7a724abb-4750-44b5-bcb3-7ee7207bdc17
+		summarizeBy: sum
+		sourceColumn: Is_Churned
+
+		annotation SummarizationSetBy = Automatic
+
+	column Is_New
+		dataType: int64
+		formatString: 0
+		lineageTag: 9d426872-838d-422a-86c4-2eeff7bcf414
+		summarizeBy: sum
+		sourceColumn: Is_New
+
+		annotation SummarizationSetBy = Automatic
+
+	column Is_Active
+		dataType: int64
+		formatString: 0
+		lineageTag: ff3b7d50-91ef-4a37-8915-73bc0d434acc
+		summarizeBy: sum
+		sourceColumn: Is_Active
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Fact_Churn = m
+		mode: import
+		source =
+				let
+				  Source = Folder.Files("C:\Users\owner\Downloads\Data\WE_DATA\Fact_Churn"),
+				  #"Filtered hidden files" = Table.SelectRows(Source, each [Attributes]?[Hidden]? <> true),
+				  #"Added custom" = let
+				    rootPath = Text.TrimEnd(Value.Metadata(Value.Type(#"Filtered hidden files"))[FileSystemTable.RootPath]?, "\"),
+				    combinePaths = (path1, path2) => Text.Combine({Text.TrimEnd(path1, "\"), path2}, "\"),
+				    getRelativePath = (path, relativeTo) => Text.Middle(path, Text.Length(relativeTo) + 1)
+				in
+				    Table.AddColumn(#"Filtered hidden files", "Relative Path", each getRelativePath(combinePaths([Folder Path], [Name]), rootPath), type text),
+				  #"Invoke custom function" = Table.AddColumn(#"Added custom", "Transform file (2)", each #"Transform file (2)"([Content])),
+				  #"Renamed columns" = Table.RenameColumns(#"Invoke custom function", {{"Relative Path", "Source.Name"}}),
+				  #"Removed other columns" = Table.SelectColumns(#"Renamed columns", {"Source.Name", "Transform file (2)"}),
+				  #"Expanded table column" = Table.ExpandTableColumn(#"Removed other columns", "Transform file (2)", Table.ColumnNames(#"Transform file (2)"(#"Sample file (2)"))),
+				  #"Changed column type" = Table.TransformColumnTypes(#"Expanded table column", {{"Churn_Key", Int64.Type}, {"Customer_Key", Int64.Type}, {"Date_Key", Int64.Type}, {"Is_Churned", Int64.Type}, {"Is_New", Int64.Type}, {"Is_Active", Int64.Type}}),
+				    #"Removed Columns" = Table.RemoveColumns(#"Changed column type",{"Source.Name"})
+				in
+				  #"Removed Columns"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation
+

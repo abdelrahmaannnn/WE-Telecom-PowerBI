@@ -1,0 +1,91 @@
+table Fact_Network
+	lineageTag: fb3366e6-b4f8-47c5-a8a9-1e9f75ecdfde
+
+	column Network_Key
+		dataType: int64
+		formatString: 0
+		lineageTag: ffdccb9b-68ab-4dac-9837-0ba2e455b356
+		summarizeBy: count
+		sourceColumn: Network_Key
+
+		annotation SummarizationSetBy = Automatic
+
+	column Date_Key
+		dataType: int64
+		formatString: 0
+		lineageTag: 10e37969-634d-42ed-a638-7d541fe2b33d
+		summarizeBy: none
+		sourceColumn: Date_Key
+
+		annotation SummarizationSetBy = Automatic
+
+	column Geo_Key
+		dataType: int64
+		formatString: 0
+		lineageTag: fb4df5b3-325c-48a7-8cb9-70796f17b119
+		summarizeBy: none
+		sourceColumn: Geo_Key
+
+		annotation SummarizationSetBy = Automatic
+
+	column Total_Calls
+		dataType: int64
+		formatString: 0
+		lineageTag: 637ea5a6-0044-4226-a9d8-703e8bd183f5
+		summarizeBy: sum
+		sourceColumn: Total_Calls
+
+		annotation SummarizationSetBy = Automatic
+
+	column Dropped_Calls
+		dataType: int64
+		formatString: 0
+		lineageTag: 9e84cab2-ff6b-4f63-99b4-7757c863632a
+		summarizeBy: sum
+		sourceColumn: Dropped_Calls
+
+		annotation SummarizationSetBy = Automatic
+
+	column Uptime_Minutes
+		dataType: int64
+		formatString: 0
+		lineageTag: 13c47312-bcf5-4ff8-9966-4264774c03e1
+		summarizeBy: sum
+		sourceColumn: Uptime_Minutes
+
+		annotation SummarizationSetBy = Automatic
+
+	column Downtime_Minutes
+		dataType: int64
+		formatString: 0
+		lineageTag: 34e4e718-c239-4c92-af10-5fa6dc3c6675
+		summarizeBy: sum
+		sourceColumn: Downtime_Minutes
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Fact_Network = m
+		mode: import
+		source =
+				let
+				  Source = Folder.Files("C:\Users\owner\Downloads\Data\WE_DATA\Fact_Network"),
+				  #"Filtered hidden files" = Table.SelectRows(Source, each [Attributes]?[Hidden]? <> true),
+				  #"Added custom" = let
+				    rootPath = Text.TrimEnd(Value.Metadata(Value.Type(#"Filtered hidden files"))[FileSystemTable.RootPath]?, "\"),
+				    combinePaths = (path1, path2) => Text.Combine({Text.TrimEnd(path1, "\"), path2}, "\"),
+				    getRelativePath = (path, relativeTo) => Text.Middle(path, Text.Length(relativeTo) + 1)
+				in
+				    Table.AddColumn(#"Filtered hidden files", "Relative Path", each getRelativePath(combinePaths([Folder Path], [Name]), rootPath), type text),
+				  #"Invoke custom function" = Table.AddColumn(#"Added custom", "Transform file (4)", each #"Transform file (4)"([Content])),
+				  #"Renamed columns" = Table.RenameColumns(#"Invoke custom function", {{"Relative Path", "Source.Name"}}),
+				  #"Removed other columns" = Table.SelectColumns(#"Renamed columns", {"Source.Name", "Transform file (4)"}),
+				  #"Expanded table column" = Table.ExpandTableColumn(#"Removed other columns", "Transform file (4)", Table.ColumnNames(#"Transform file (4)"(#"Sample file (4)"))),
+				  #"Changed column type" = Table.TransformColumnTypes(#"Expanded table column", {{"Network_Key", Int64.Type}, {"Date_Key", Int64.Type}, {"Geo_Key", Int64.Type}, {"Total_Calls", Int64.Type}, {"Dropped_Calls", Int64.Type}, {"Uptime_Minutes", Int64.Type}, {"Downtime_Minutes", Int64.Type}}),
+				    #"Removed Columns" = Table.RemoveColumns(#"Changed column type",{"Source.Name"})
+				in
+				  #"Removed Columns"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation
+

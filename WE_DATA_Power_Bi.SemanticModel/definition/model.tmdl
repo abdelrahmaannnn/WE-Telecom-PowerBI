@@ -1,0 +1,71 @@
+model Model
+	culture: en-US
+	defaultPowerBIDataSourceVersion: powerBI_V3
+	sourceQueryCulture: en-GB
+	valueFilterBehavior: independent
+	dataAccessOptions
+		legacyRedirects
+		returnErrorValuesAsNull
+
+queryGroup 'Transform file from Fact_Acquisition'
+
+	annotation PBI_QueryGroupOrder = 0
+
+queryGroup 'Transform file from Fact_Acquisition\Helper queries'
+
+	annotation PBI_QueryGroupOrder = 0
+
+queryGroup 'Transform file from Fact_Churn'
+
+	annotation PBI_QueryGroupOrder = 2
+
+queryGroup 'Transform file from Fact_Churn\Helper queries (2)'
+
+	annotation PBI_QueryGroupOrder = 0
+
+queryGroup 'Transform file from Fact_Experience'
+
+	annotation PBI_QueryGroupOrder = 4
+
+queryGroup 'Transform file from Fact_Experience\Helper queries (3)'
+
+	annotation PBI_QueryGroupOrder = 0
+
+queryGroup 'Transform file from Fact_Network'
+
+	annotation PBI_QueryGroupOrder = 6
+
+queryGroup 'Transform file from Fact_Network\Helper queries (4)'
+
+	annotation PBI_QueryGroupOrder = 0
+
+queryGroup 'Transform file from Fact_Revenue'
+
+	annotation PBI_QueryGroupOrder = 8
+
+queryGroup 'Transform file from Fact_Revenue\Helper queries (5)'
+
+	annotation PBI_QueryGroupOrder = 0
+
+annotation __PBI_TimeIntelligenceEnabled = 1
+
+annotation PBI_QueryOrder = ["Fact_Acquisition","Sample file","Parameter","Transform Sample file","Transform file","Fact_Churn","Sample file (2)","Parameter (2)","Transform Sample file (2)","Transform file (2)","Fact_Experience","Sample file (3)","Parameter (3)","Transform Sample file (3)","Transform file (3)","Fact_Network","Sample file (4)","Parameter (4)","Transform Sample file (4)","Transform file (4)","Fact_Revenue","Sample file (5)","Parameter (5)","Transform Sample file (5)","Transform file (5)","Dim_Channel","Dim_Customer","Dim_Date","Dim_Geography","Dim_Plan"]
+
+annotation PBI_ProTooling = ["MCP-PBIModeling","DevMode"]
+
+ref table Fact_Acquisition
+ref table Fact_Churn
+ref table Fact_Experience
+ref table Fact_Network
+ref table Fact_Revenue
+ref table Dim_Channel
+ref table Dim_Customer
+ref table Dim_Date
+ref table DateTableTemplate_65137f6a-fa29-41d5-a3a1-ca04f619c200
+ref table LocalDateTable_6e17aeb9-a653-4cd6-b95f-78c8f5c13bc7
+ref table Dim_Geography
+ref table Dim_Plan
+ref table Measure
+
+ref cultureInfo en-US
+

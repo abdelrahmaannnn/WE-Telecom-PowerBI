@@ -1,0 +1,153 @@
+table Measure
+	lineageTag: 082684db-2e58-4fd5-8fe7-b60391a09eb2
+
+	measure 'Total Revenue' = SUM(Fact_Revenue[Revenue])
+		formatString: #,##0
+		displayFolder: Revenue
+		lineageTag: 4808f521-a542-4983-b0e8-1039601144f0
+
+	measure 'Active Customers' = CALCULATE(DISTINCTCOUNT(Dim_Customer[Customer_Key]), Dim_Customer[Status] = "Active")
+		formatString: #,##0
+		displayFolder: Churn
+		lineageTag: a92d3502-5f86-4962-b953-a77cbb719ca4
+
+	measure 'Average Gross Margin %' = AVERAGE(Fact_Revenue[Gross_Margin])
+		formatString: 0.0%
+		displayFolder: Revenue
+		lineageTag: 4558f1d1-bc8b-4d20-900c-fc856a31f0d3
+
+	measure 'Gross Margin %' = DIVIDE([Gross Profit], [Total Revenue])
+		formatString: 0.0%
+		displayFolder: Revenue
+		lineageTag: e33da090-8027-457e-b965-0a6977ba362d
+
+	measure 'Total Data Usage GB' = SUM(Fact_Revenue[Data_Usage_GB])
+		formatString: #,##0.0
+		displayFolder: Revenue
+		lineageTag: 282c209e-2d6e-4a34-804a-75629041408f
+
+	measure 'Total Voice Minutes' = SUM(Fact_Revenue[Voice_Minutes])
+		formatString: #,##0.0
+		displayFolder: Revenue
+		lineageTag: ce8b0afa-da59-40de-aec0-2e17da33ecc5
+
+	measure ARPU =
+			
+			AVERAGEX(
+			    VALUES(Dim_Date[Year Month]),
+			    VAR rev =
+			        CALCULATE(
+			            SUM(Fact_Revenue[Revenue]),
+			            Dim_Customer[Status] = "Active"
+			        )
+			    VAR cust =
+			        CALCULATE(
+			            DISTINCTCOUNT(Dim_Customer[Customer_Key]),
+			            Dim_Customer[Status] = "Active"
+			        )
+			    RETURN
+			        DIVIDE(rev, cust)
+			)
+		formatString: #,##0.00
+		displayFolder: Revenue
+		lineageTag: 085f2856-6fa1-4a64-806f-6291e00f1458
+
+	measure 'Total Marketing Spend' = SUM(Fact_Acquisition[Marketing_Spend])
+		formatString: #,##0
+		displayFolder: Acquisition
+		lineageTag: a5f5dacc-110b-4653-b982-ddac3e758f7b
+
+	measure 'Total Sales Spend' = SUM(Fact_Acquisition[Sales_Spend])
+		formatString: #,##0
+		displayFolder: Acquisition
+		lineageTag: e38d7003-1916-494b-86ff-1f52d4efb621
+
+	measure 'Total New Customers' = SUM(Fact_Acquisition[New_Customers])
+		formatString: #,##0
+		displayFolder: Acquisition
+		lineageTag: c1434202-42b9-43f5-b8d0-54c1b7668ba5
+
+	measure 'Customer Acquisition Cost' = DIVIDE([Total Marketing Spend] + [Total Sales Spend], [Total New Customers])
+		formatString: #,##0.00
+		displayFolder: Acquisition
+		lineageTag: 18d13306-feca-4411-aeeb-86bb7dd4bd78
+
+	measure 'Total Churned Customers' = SUM(Fact_Churn[Is_Churned])
+		formatString: #,##0
+		displayFolder: Churn
+		lineageTag: 7ef257b2-5f98-4ddc-983f-262702e2d3a2
+
+	measure 'Total Active Customers' = SUM(Fact_Churn[Is_Active])
+		formatString: #,##0
+		displayFolder: Churn
+		lineageTag: 3957084a-77cb-43d6-857d-e3fe1ed8805a
+
+	measure 'Total New (Churn Table)' = SUM(Fact_Churn[Is_New])
+		formatString: #,##0
+		displayFolder: Churn
+		lineageTag: d80b9ad4-6ede-4575-b9ba-54202484a053
+
+	measure 'Churn Rate' = DIVIDE([Total Churned Customers], [Total Active Customers])
+		formatString: 0.0%
+		displayFolder: Churn
+		lineageTag: 2291e7b8-3219-45a1-93cd-f3234d6fee85
+
+	measure 'Average NPS Score' = AVERAGE(Fact_Experience[NPS_Score])
+		formatString: #,##0.0
+		displayFolder: Experience
+		lineageTag: 7ba1ebb0-a262-4035-beb1-928d6ab1d7d5
+
+	measure 'Average CSAT Score' = AVERAGE(Fact_Experience[CSAT_Score])
+		formatString: #,##0.0
+		displayFolder: Experience
+		lineageTag: 60f81a06-6c0c-40af-96b4-74324bc05aac
+
+	measure 'First Contact Resolution Rate' = DIVIDE(SUM(Fact_Experience[Issue_Resolved_First_Contact]), COUNTROWS(Fact_Experience))
+		formatString: 0.0%
+		displayFolder: Experience
+		lineageTag: ef97869c-5668-4785-8230-3a4db19f9ef1
+
+	measure 'Total Calls' = SUM(Fact_Network[Total_Calls])
+		formatString: #,##0
+		displayFolder: Network
+		lineageTag: 4c656215-ee6d-478c-ae4a-f436a262391e
+
+	measure 'Total Dropped Calls' = SUM(Fact_Network[Dropped_Calls])
+		formatString: #,##0
+		displayFolder: Network
+		lineageTag: 50f789b9-e16b-492c-bddf-a5e345db6762
+
+	measure 'Dropped Call Rate' = DIVIDE([Total Dropped Calls], [Total Calls])
+		formatString: 0.00%
+		displayFolder: Network
+		lineageTag: 3016e392-29c5-4104-970f-56784bc7733e
+
+	measure 'Total Uptime Minutes' = SUM(Fact_Network[Uptime_Minutes])
+		formatString: #,##0
+		displayFolder: Network
+		lineageTag: 022c0222-7f3d-4a0e-b612-44e9b77149f6
+
+	measure 'Total Downtime Minutes' = SUM(Fact_Network[Downtime_Minutes])
+		formatString: #,##0
+		displayFolder: Network
+		lineageTag: f6918e28-f2b2-46b6-8299-cb4b2a101e10
+
+	measure 'Network Availability %' = DIVIDE([Total Uptime Minutes], [Total Uptime Minutes] + [Total Downtime Minutes])
+		formatString: 0.00%
+		displayFolder: Network
+		lineageTag: 789c734f-c494-4b4b-b428-60146611e110
+
+	measure 'Gross Profit' = SUMX(Fact_Revenue, Fact_Revenue[Revenue] * Fact_Revenue[Gross_Margin])
+		formatString: 0
+		lineageTag: 6dffa190-c287-4bff-99f8-1767f578d586
+
+	column Value
+		isHidden
+		lineageTag: 2bab77c7-1fa4-49c8-8945-ebe1e6ed6821
+		isNameInferred
+		sourceColumn: [Value]
+
+	partition Measure = calculated
+		mode: import
+		source = {BLANK()}
+

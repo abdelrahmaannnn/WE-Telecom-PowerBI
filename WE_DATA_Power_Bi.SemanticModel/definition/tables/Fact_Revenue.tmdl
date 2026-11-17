@@ -1,0 +1,113 @@
+table Fact_Revenue
+	lineageTag: 74a2ecf7-ec8c-4a79-80ef-c9ffe653f14c
+
+	column Revenue_Key
+		dataType: int64
+		formatString: 0
+		lineageTag: 5dcfec4c-d6cd-4350-8a0b-1ecd910609b4
+		summarizeBy: count
+		sourceColumn: Revenue_Key
+
+		annotation SummarizationSetBy = Automatic
+
+	column Customer_Key
+		dataType: int64
+		formatString: 0
+		lineageTag: e13a6a35-326f-4a0f-8ba7-6ade26979d35
+		summarizeBy: count
+		sourceColumn: Customer_Key
+
+		annotation SummarizationSetBy = Automatic
+
+	column Date_Key
+		dataType: int64
+		formatString: 0
+		lineageTag: cabb1f22-1fc0-45a9-a3dc-889570f5ad3c
+		summarizeBy: none
+		sourceColumn: Date_Key
+
+		annotation SummarizationSetBy = Automatic
+
+	column Plan_Key
+		dataType: int64
+		formatString: 0
+		lineageTag: d621fa39-03fa-457a-be73-cde2786435bb
+		summarizeBy: none
+		sourceColumn: Plan_Key
+
+		annotation SummarizationSetBy = Automatic
+
+	column Geo_Key
+		dataType: int64
+		formatString: 0
+		lineageTag: 07454cc7-7350-408b-b51c-2afa4b8c87bb
+		summarizeBy: none
+		sourceColumn: Geo_Key
+
+		annotation SummarizationSetBy = Automatic
+
+	column Revenue
+		dataType: double
+		lineageTag: f7f6ba14-b2fe-4e69-94d5-8771c3251929
+		summarizeBy: sum
+		sourceColumn: Revenue
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column Gross_Margin
+		dataType: double
+		lineageTag: 66807052-bb8c-4009-b266-c6e44cc4ee9d
+		summarizeBy: sum
+		sourceColumn: Gross_Margin
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column Data_Usage_GB
+		dataType: double
+		lineageTag: ed06afdc-ff84-4936-a53b-6310e78a921c
+		summarizeBy: sum
+		sourceColumn: Data_Usage_GB
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column Voice_Minutes
+		dataType: double
+		lineageTag: 64cfc895-5f2b-4653-b879-f47d9ec54f61
+		summarizeBy: sum
+		sourceColumn: Voice_Minutes
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	partition Fact_Revenue = m
+		mode: import
+		source =
+				let
+				  Source = Folder.Files("C:\Users\owner\Downloads\Data\WE_DATA\Fact_Revenue"),
+				  #"Filtered hidden files" = Table.SelectRows(Source, each [Attributes]?[Hidden]? <> true),
+				  #"Added custom" = let
+				    rootPath = Text.TrimEnd(Value.Metadata(Value.Type(#"Filtered hidden files"))[FileSystemTable.RootPath]?, "\"),
+				    combinePaths = (path1, path2) => Text.Combine({Text.TrimEnd(path1, "\"), path2}, "\"),
+				    getRelativePath = (path, relativeTo) => Text.Middle(path, Text.Length(relativeTo) + 1)
+				in
+				    Table.AddColumn(#"Filtered hidden files", "Relative Path", each getRelativePath(combinePaths([Folder Path], [Name]), rootPath), type text),
+				  #"Invoke custom function" = Table.AddColumn(#"Added custom", "Transform file (5)", each #"Transform file (5)"([Content])),
+				  #"Renamed columns" = Table.RenameColumns(#"Invoke custom function", {{"Relative Path", "Source.Name"}}),
+				  #"Removed other columns" = Table.SelectColumns(#"Renamed columns", {"Source.Name", "Transform file (5)"}),
+				  #"Expanded table column" = Table.ExpandTableColumn(#"Removed other columns", "Transform file (5)", Table.ColumnNames(#"Transform file (5)"(#"Sample file (5)"))),
+				  #"Changed column type" = Table.TransformColumnTypes(#"Expanded table column", {{"Revenue_Key", Int64.Type}, {"Customer_Key", Int64.Type}, {"Date_Key", Int64.Type}, {"Plan_Key", Int64.Type}, {"Geo_Key", Int64.Type}, {"Revenue", type number}, {"Gross_Margin", type number}, {"Data_Usage_GB", type number}, {"Voice_Minutes", type number}}),
+				    #"Removed Columns" = Table.RemoveColumns(#"Changed column type",{"Source.Name"})
+				in
+				  #"Removed Columns"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation
+

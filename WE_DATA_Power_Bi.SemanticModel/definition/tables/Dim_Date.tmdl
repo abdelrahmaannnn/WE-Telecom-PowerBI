@@ -1,0 +1,78 @@
+table Dim_Date
+	lineageTag: 44b30a98-3dd9-4f8c-aa53-7890ca578379
+
+	column Date_Key
+		dataType: int64
+		formatString: 0
+		lineageTag: 8b63863b-947f-4318-8ebd-70587e726637
+		summarizeBy: none
+		sourceColumn: Date_Key
+
+		annotation SummarizationSetBy = Automatic
+
+	column Full_Date
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 3bb4294e-c315-4d21-a8c0-28bb99769683
+		summarizeBy: none
+		sourceColumn: Full_Date
+
+		variation Variation
+			isDefault
+			relationship: 43766d75-2960-4998-ac1b-0901ddfc1037
+			defaultHierarchy: LocalDateTable_6e17aeb9-a653-4cd6-b95f-78c8f5c13bc7.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column Month
+		dataType: int64
+		formatString: 0
+		lineageTag: 3ed2aa68-5800-4021-ae9f-1570629661c9
+		summarizeBy: sum
+		sourceColumn: Month
+
+		annotation SummarizationSetBy = Automatic
+
+	column Year
+		dataType: int64
+		formatString: 0
+		lineageTag: 9fa817fe-cbc1-4ee6-88a0-423c18d53693
+		summarizeBy: sum
+		sourceColumn: Year
+
+		annotation SummarizationSetBy = Automatic
+
+	column Quarter
+		dataType: int64
+		formatString: 0
+		lineageTag: 8c12f0b3-0753-477a-972a-47e887e163b6
+		summarizeBy: sum
+		sourceColumn: Quarter
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Year Month' = FORMAT(Dim_Date[Full_Date], "MMM YYYY")
+		lineageTag: d8c6cad5-2ccc-46ee-9645-06571f66374a
+		sortByColumn: 'Year Month Sort'
+
+	column 'Year Month Sort' = Dim_Date[Year] * 100 + Dim_Date[Month]
+		isHidden
+		formatString: 0
+		lineageTag: e16eb7e0-5c03-4de5-af8e-a34dd3a075aa
+
+	partition Dim_Date = m
+		mode: import
+		source =
+				let
+				  Source = Csv.Document(File.Contents("C:\Users\owner\Downloads\Data\WE_DATA\Dimensions\Dim_Date.csv"), [Delimiter = ",", Columns = 5, Encoding = 65001]),
+				  #"Promoted headers" = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
+				  #"Changed column type" = Table.TransformColumnTypes(#"Promoted headers", {{"Date_Key", Int64.Type}, {"Full_Date", type date}, {"Month", Int64.Type}, {"Year", Int64.Type}, {"Quarter", Int64.Type}}, "en-US")
+				in
+				    #"Changed column type"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

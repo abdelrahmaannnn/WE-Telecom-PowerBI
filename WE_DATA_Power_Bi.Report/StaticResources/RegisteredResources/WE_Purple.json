@@ -1,0 +1,56 @@
+{
+  "name": "WE Purple",
+  "dataColors": [
+    "#6B2C91",
+    "#C13B9A",
+    "#E78AC3",
+    "#8E7CC3",
+    "#3E1F5C",
+    "#F2A1D0",
+    "#5E8DE0",
+    "#F7B267"
+  ],
+  "background": "#FFFFFF",
+  "foreground": "#2B1840",
+  "tableAccent": "#8E2A8C",
+  "good": "#2E9E6B",
+  "bad": "#C8364F",
+  "neutral": "#8E7CC3",
+  "textClasses": {
+    "label": {
+      "fontFace": "Segoe UI",
+      "color": "#5A4A6B",
+      "fontSize": 9
+    },
+    "title": {
+      "fontFace": "Segoe UI Semibold",
+      "color": "#3E1F5C",
+      "fontSize": 12
+    },
+    "callout": {
+      "fontFace": "Segoe UI Semibold",
+      "color": "#2B1840"
+    }
+  },
+  "visualStyles": {
+    "*": {
+      "*": {
+        "background": [
+          {
+            "show": false
+          }
+        ],
+        "border": [
+          {
+            "show": false
+          }
+        ],
+        "dropShadow": [
+          {
+            "show": false
+          }
+        ]
+      }
+    }
+  }
+}

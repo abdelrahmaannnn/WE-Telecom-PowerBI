@@ -1,0 +1,57 @@
+relationship AutoDetected_a768c1a3-7fea-4f46-b6ca-5f41711323bf
+	fromColumn: Fact_Acquisition.Channel_Key
+	toColumn: Dim_Channel.Channel_Key
+
+relationship 43766d75-2960-4998-ac1b-0901ddfc1037
+	joinOnDateBehavior: datePartOnly
+	fromColumn: Dim_Date.Full_Date
+	toColumn: LocalDateTable_6e17aeb9-a653-4cd6-b95f-78c8f5c13bc7.Date
+
+relationship AutoDetected_a44c6a22-0823-450b-82f1-8eb19d8cb5b5
+	fromColumn: Fact_Acquisition.Date_Key
+	toColumn: Dim_Date.Date_Key
+
+relationship AutoDetected_8bd7dce0-35a8-4a29-8cc9-2cc746d4c60f
+	fromColumn: Fact_Churn.Date_Key
+	toColumn: Dim_Date.Date_Key
+
+relationship AutoDetected_986e35a0-74b1-4c55-a163-60f525ac624f
+	fromColumn: Fact_Experience.Date_Key
+	toColumn: Dim_Date.Date_Key
+
+relationship AutoDetected_864ba276-fd08-4fe3-b383-51cdffc6c478
+	fromColumn: Fact_Network.Date_Key
+	toColumn: Dim_Date.Date_Key
+
+relationship AutoDetected_d9b2e8d1-3577-4f5a-a7b7-3d3d4489a252
+	fromColumn: Fact_Revenue.Date_Key
+	toColumn: Dim_Date.Date_Key
+
+relationship AutoDetected_d2dedc46-116c-4040-b065-d996399ae3a7
+	fromColumn: Fact_Acquisition.Geo_Key
+	toColumn: Dim_Geography.Geo_Key
+
+relationship AutoDetected_22a1d2f2-5a43-4193-9413-07bdf8b048e9
+	fromColumn: Fact_Network.Geo_Key
+	toColumn: Dim_Geography.Geo_Key
+
+relationship AutoDetected_350140e8-fe73-40a6-95b8-d8f4d790e763
+	fromColumn: Fact_Revenue.Geo_Key
+	toColumn: Dim_Geography.Geo_Key
+
+relationship AutoDetected_9edfb6e2-77aa-4dcf-aa89-20506e899dc0
+	fromColumn: Fact_Revenue.Plan_Key
+	toColumn: Dim_Plan.Plan_Key
+
+relationship Fact_Revenue_Customer_Key_Dim_Customer_Customer_Key
+	fromColumn: Fact_Revenue.Customer_Key
+	toColumn: Dim_Customer.Customer_Key
+
+relationship Fact_Churn_Customer_Key_Dim_Customer_Customer_Key
+	fromColumn: Fact_Churn.Customer_Key
+	toColumn: Dim_Customer.Customer_Key
+
+relationship Fact_Experience_Customer_Key_Dim_Customer_Customer_Key
+	fromColumn: Fact_Experience.Customer_Key
+	toColumn: Dim_Customer.Customer_Key
+

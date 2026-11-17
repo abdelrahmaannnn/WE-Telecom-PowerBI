@@ -1,0 +1,87 @@
+table Dim_Customer
+	lineageTag: 2b0753ea-9ccf-4190-ab28-e3b26c0dbafc
+
+	column Customer_Key
+		dataType: int64
+		formatString: 0
+		lineageTag: 8470c4a9-587f-4e10-be3f-29243e1d9628
+		summarizeBy: count
+		sourceColumn: Customer_Key
+
+		annotation SummarizationSetBy = Automatic
+
+	column Customer_ID
+		dataType: string
+		lineageTag: b7d4785d-644a-46d5-860a-fb4528811d7c
+		summarizeBy: none
+		sourceColumn: Customer_ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column Customer_Name
+		dataType: string
+		lineageTag: 1f8167a4-00cc-4323-be0c-589ee7a63d37
+		summarizeBy: none
+		sourceColumn: Customer_Name
+
+		annotation SummarizationSetBy = Automatic
+
+	column Status
+		dataType: string
+		lineageTag: 158dd293-8f43-4e7d-8492-40676f35ec79
+		summarizeBy: none
+		sourceColumn: Status
+
+		annotation SummarizationSetBy = Automatic
+
+	column Segment
+		dataType: string
+		lineageTag: a90bab71-37b9-49f2-8f23-278f41613227
+		summarizeBy: none
+		sourceColumn: Segment
+
+		annotation SummarizationSetBy = Automatic
+
+	column City
+		dataType: string
+		lineageTag: eb5d1f93-3f94-458c-a91e-ad14c81d22f8
+		summarizeBy: none
+		sourceColumn: City
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Dim_Customer = m
+		mode: import
+		source =
+				let
+				  Source = Csv.Document(File.Contents("C:\Users\owner\Downloads\Data\WE_DATA\Dimensions\Dim_Customer.csv"), [Delimiter = ",", Columns = 6, Encoding = 65001]),
+				  #"Promoted headers" = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
+				  #"Changed column type" = Table.TransformColumnTypes(#"Promoted headers", {{"Customer_Key", Int64.Type}, {"Customer_ID", type text}, {"Customer_Name", type text}, {"Status", type text}, {"Segment", type text}, {"City", type text}}, "en-US"),
+				    #"Removed Duplicates" = Table.Distinct(#"Changed column type", {"Customer_Key"}),
+				    #"Capitalized Each Word" = Table.TransformColumns(#"Removed Duplicates",{{"Status", Text.Proper, type text}}),
+				    #"Trimmed Text" = Table.TransformColumns(#"Capitalized Each Word",{{"Status", Text.Trim, type text}}),
+				    #"Capitalized Each Word1" = Table.TransformColumns(#"Trimmed Text",{{"Status", Text.Proper, type text}}),
+				    #"Replaced Value" = Table.ReplaceValue(#"Capitalized Each Word1","Act","Active",Replacer.ReplaceValue,{"Status"}),
+				    #"Replaced Value1" = Table.ReplaceValue(#"Replaced Value","A","Active",Replacer.ReplaceValue,{"Status"}),
+				    #"Trimmed Text1" = Table.TransformColumns(#"Replaced Value1",{{"City", Text.Trim, type text}}),
+				    #"Capitalized Each Word2" = Table.TransformColumns(#"Trimmed Text1",{{"City", Text.Proper, type text}}),
+				    #"Added Custom" = Table.AddColumn(#"Capitalized Each Word2", "Custom", each if [City] = "القاهرة" then "Cairo"
+				else if [City] = "Alex" then "Alexandria"
+				else if [City] = "الإسكندرية" then "Alexandria"
+				else if [City] = "المنصورة" then "Mansoura"
+				else if [City] = "المنصورة" then "Mansoura"
+				else if [City] = "طنطا" then "Tanta"
+				else if [City] = "جیزة" then "Giza"
+				else if [City] = "" then "N/A"
+				else [City]),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Added Custom",{{"Custom", type text}}),
+				    #"Replaced Value2" = Table.ReplaceValue(#"Changed Type","جيزة","Giza",Replacer.ReplaceText,{"Custom"}),
+				    #"Removed Columns" = Table.RemoveColumns(#"Replaced Value2",{"City"}),
+				    #"Renamed Columns" = Table.RenameColumns(#"Removed Columns",{{"Custom", "City"}})
+				in
+				    #"Renamed Columns"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

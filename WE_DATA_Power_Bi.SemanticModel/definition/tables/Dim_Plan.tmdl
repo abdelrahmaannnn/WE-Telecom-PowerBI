@@ -1,0 +1,53 @@
+table Dim_Plan
+	lineageTag: 42b6ad47-9923-4f02-b742-ad16646861b7
+
+	column Plan_Key
+		dataType: int64
+		formatString: 0
+		lineageTag: 5558cbca-243b-4659-800d-8850d3e245ef
+		summarizeBy: none
+		sourceColumn: Plan_Key
+
+		annotation SummarizationSetBy = Automatic
+
+	column Plan_Name
+		dataType: string
+		lineageTag: 3b1d6ec0-c5d2-4c04-a8cb-b5ca540bc84d
+		summarizeBy: none
+		sourceColumn: Plan_Name
+
+		annotation SummarizationSetBy = Automatic
+
+	column Monthly_Fee
+		dataType: int64
+		formatString: 0
+		lineageTag: 04a45799-811a-43d6-a22b-b0467ee4078e
+		summarizeBy: none
+		sourceColumn: Monthly_Fee
+
+		annotation SummarizationSetBy = Automatic
+
+	column Plan_Type
+		dataType: string
+		lineageTag: 479cc1f4-11e1-4f88-836a-7405be8d144f
+		summarizeBy: none
+		sourceColumn: Plan_Type
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Dim_Plan = m
+		mode: import
+		source =
+				let
+				  Source = Csv.Document(File.Contents("C:\Users\owner\Downloads\Data\WE_DATA\Dimensions\Dim_Plan.csv"), [Delimiter = ",", Columns = 4, Encoding = 65001]),
+				  #"Promoted headers" = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
+				  #"Changed column type" = Table.TransformColumnTypes(#"Promoted headers", {{"Plan_Key", Int64.Type}, {"Plan_Name", type text}, {"Monthly_Fee", Int64.Type}, {"Plan_Type", type text}}, "en-US"),
+				    #"Trimmed Text" = Table.TransformColumns(#"Changed column type",{{"Plan_Name", Text.Trim, type text}}),
+				    #"Capitalized Each Word" = Table.TransformColumns(#"Trimmed Text",{{"Plan_Name", Text.Proper, type text}})
+				in
+				    #"Capitalized Each Word"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+
