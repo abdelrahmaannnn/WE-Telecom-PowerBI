@@ -2,7 +2,13 @@
 
 A three-page Power BI report for WE (Telecom Egypt) covering revenue, customers, churn, network quality and customer experience from Jan 2024 to Dec 2025.
 
-![Home page background](assets/home_bg.png)
+## Screenshots
+
+### Revenue & Customers
+![Revenue & Customer Overview](screenshots/dashboard.png)
+
+### Network & Experience
+![Network & Customer Experience](screenshots/network_experience.png)
 
 ## Report pages
 
