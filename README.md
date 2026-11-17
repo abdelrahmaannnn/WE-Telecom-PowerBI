@@ -4,6 +4,9 @@ A three-page Power BI report for WE (Telecom Egypt) covering revenue, customers,
 
 ## Screenshots
 
+### Home
+![Home page](screenshots/home.png)
+
 ### Revenue & Customers
 ![Revenue & Customer Overview](screenshots/dashboard.png)
 
